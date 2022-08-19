@@ -16,6 +16,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@emotion/react": "latest",
+    "@emotion/server": "latest",
+    "@emotion/styled": "latest",
+    "@mui/material": "latest",
     "gatsby": "^4.21.0",
     "react": "^18.1.0",
     "react-dom": "^18.1.0"

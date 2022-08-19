@@ -1,5 +1,6 @@
 import * as React from "react"
 import type { HeadFC } from "gatsby"
+import {Button} from "@mui/material";
 
 const pageStyles = {
   color: "#232129",
@@ -139,6 +140,7 @@ const links = [
 const IndexPage = () => {
   return (
     <main style={pageStyles}>
+        <Button>lol</Button>
       <h1 style={headingStyles}>
         Congratulations
         <br />
