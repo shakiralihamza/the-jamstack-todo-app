@@ -7,3 +7,5 @@ src/gatsby-types.d.ts
 
 # Local Netlify folder
 .netlify
+
+.env
