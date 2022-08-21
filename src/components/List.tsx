@@ -10,7 +10,7 @@ import IconButton from "@mui/material/IconButton";
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import EditIcon from '@mui/icons-material/Edit';
 import {Checkbox, CircularProgress} from "@mui/material";
-import {useContext, useEffect, useState} from "react";
+import {useState} from "react";
 // import {MyContext} from "../context/MyContext";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
@@ -121,7 +121,7 @@ const todos: any = []
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {todos.map((todo) => {
+                    {todos.map((todo: any) => {
                         return (
                             <TableRow
                                 key={todo.id}
