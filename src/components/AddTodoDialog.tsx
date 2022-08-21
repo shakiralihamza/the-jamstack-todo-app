@@ -4,50 +4,47 @@ import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import {Grid, Stack} from "@mui/material";
 import Typography from "@mui/material/Typography";
-// import {MyContext} from "../context/MyContext";
-// import {useContext} from "react";
+import MyContext from "../context/MyContext";
+import {useContext} from "react";
 import LoadingButton from '@mui/lab/LoadingButton';
+import {gql, useMutation} from "@apollo/client";
 
-/*function createTodo(data) {
-    return fetch('/.netlify/functions/create', {
-        body: JSON.stringify(data),
-        method: 'POST'
-    }).then(response => {
-        return response.json()
-    })
-}*/
+const CREATE_TODO = gql`
+    mutation CreateTodo($title: String!, $author: String!) {
+        createTodo(title: $title, author: $author) {
+            id
+            title
+            author
+            completed
+        }
+    }
+`;
 
 export default function AddTodoDialog() {
-    const [todo, setTodo] = React.useState('');
+    const [title, setTitle] = React.useState('');
     const [author, setAuthor] = React.useState('');
-    const isDialogOpen = false;
-    // const {todos, setTodos, isDialogOpen, setIsDialogOpen} = useContext(MyContext);
-    //state loading
+    const {todos, setTodos, isDialogOpen, setIsDialogOpen} = useContext(MyContext);
+
+    const [createTodo] = useMutation(CREATE_TODO);
     const [isLoading, setIsLoading] = React.useState(false);
     const handleSubmit = () => {
-        /*setIsLoading(true);
-        const myTodo = {
-            item: todo,
-            author,
-            completed: false
-        }
-        createTodo(myTodo)
+        setIsLoading(true);
+
+        createTodo({variables: {title, author}})
             .then((response) => {
-                console.log('API response', response)
-                // set app state
-                setTodos([...todos, {...response.data, id: response.ref['@ref'].id}])
-                setTodo('')
+                setTodos([...todos, response.data.createTodo]);
+                setTitle('')
                 setAuthor('')
                 setIsLoading(false)
                 handleClose()
             })
-            .catch((error) => {
-                console.log('API error', error)
-            })*/
+            .catch(err => {
+                console.log(err)
+            })
     }
 
     const handleClose = () => {
-        // setIsDialogOpen(false);
+        setIsDialogOpen(false);
     };
 
     return (
@@ -92,8 +89,8 @@ export default function AddTodoDialog() {
                                 disabled={isLoading}
                                 variant={"outlined"}
                                 label="Todo Item"
-                                value={todo}
-                                onChange={(e) => setTodo(e.target.value)}
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
                             />
                             <TextField
                                 disabled={isLoading}

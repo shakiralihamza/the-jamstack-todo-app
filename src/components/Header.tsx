@@ -22,7 +22,7 @@ export default function Header() {
                         <AppsIcon fontSize={'large'} />
                     </IconButton>
                     <Typography variant="h5" fontWeight={100}>
-                        Serverless CRUD App
+                        Jamstack ToDo App
                     </Typography>
                 </Toolbar>
             </AppBar>

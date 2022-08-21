@@ -4,57 +4,59 @@ import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import {Grid, Stack} from "@mui/material";
 import Typography from "@mui/material/Typography";
-// import {MyContext} from "../context/MyContext";
-// import {useContext, useEffect} from "react";
 import LoadingButton from "@mui/lab/LoadingButton";
+import {gql, useMutation} from "@apollo/client";
+import {useContext, useEffect} from "react";
+import MyContext from "../context/MyContext";
+import {Todo} from "../interfaces";
 
-/*const updateTodo = (updatedTodo) => {
-    return fetch('/.netlify/functions/update', {
-        body: JSON.stringify(updatedTodo),
-        method: 'POST',
-    }).then(response => {
-        return response.json()
-    })
-}*/
+
+const UPDATE_TODO = gql`
+    mutation UpdateTodo($updateTodoId: ID!, $title: String!, $author: String!) {
+        updateTodo(id: $updateTodoId, title: $title, author: $author) {
+            id
+        }
+    }
+`;
 
 export default function EditTodoDialog() {
-    // const {isEditDialogOpen, setIsEditDialogOpen, todoToEdit, setTodos, todos} = useContext(MyContext);
+    const {isEditDialogOpen, setIsEditDialogOpen, todoToEdit, setTodos, todos} = useContext(MyContext);
 
-    const [todo, setTodo] = React.useState('');
-    const [author, setAuthor] = React.useState('');
+    const [updateTodo] = useMutation(UPDATE_TODO);
+    const [title, setTitle] = React.useState<string>('');
+    const [author, setAuthor] = React.useState<string>('');
     const [isLoading, setIsLoading] = React.useState(false);
-const isEditDialogOpen = false;
-/*
     useEffect(() => {
-        setTodo(todoToEdit.item);
+        setTitle(todoToEdit.title);
         setAuthor(todoToEdit.author);
-    },[isEditDialogOpen, todoToEdit.author, todoToEdit.item]);
-*/
+    }, [isEditDialogOpen]);
+
     const handleSubmit = () => {
-        /*setIsLoading(true);
+        setIsLoading(true);
         const updatedTodo = {
             ...todoToEdit,
-            item: todo,
+            title,
             author
         }
-        updateTodo(updatedTodo)
-            .then((response) => {
-                console.log('Update API response', response)
-                // set app state
-                const newTodos = todos.map(todo => todo.id === response.data.id ? response.data : todo)
+        console.log(todoToEdit);
+        updateTodo({variables: {updateTodoId: todoToEdit.id, title, author}})
+            .then(() => {
+                const newTodos: Todo[] = todos.map(todo => {
+                    if (todo.id === updatedTodo.id) {
+                        return updatedTodo;
+                    }
+                    return todo;
+                })
                 setTodos(newTodos)
 
-                setTodo('')
+                setTitle('')
                 setAuthor('')
                 setIsLoading(false)
                 handleClose()
-            })
-            .catch((error) => {
-                console.log('API error', error)
-            })*/
+            }).catch((err) => console.log('error: ', err))
     }
     const handleClose = () => {
-        // setIsEditDialogOpen(false);
+        setIsEditDialogOpen(false);
     };
 
     return (
@@ -96,10 +98,10 @@ const isEditDialogOpen = false;
                         <Stack spacing={5}>
                             <TextField
                                 disabled={isLoading}
-                                value={todo}
+                                value={title}
                                 variant={"outlined"}
                                 label="Todo Item"
-                                onChange={(e) => setTodo(e.target.value)}
+                                onChange={(e) => setTitle(e.target.value)}
                             />
                             <TextField
                                 disabled={isLoading}

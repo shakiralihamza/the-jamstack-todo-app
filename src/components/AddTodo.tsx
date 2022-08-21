@@ -5,14 +5,14 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import {Paper} from "@mui/material";
-// import {useContext} from "react";
-// import {MyContext} from "../context/MyContext";
+import {useContext} from "react";
+import MyContext from "../context/MyContext";
 
 export default function AddTodo() {
-    // const {setIsDialogOpen} = useContext(MyContext);
+    const {setIsDialogOpen} = useContext(MyContext);
 
     const handleDialogOpen = () => {
-        // setIsDialogOpen(true);
+        setIsDialogOpen(true);
     };
     return (
         <Box sx={{flexGrow: 1, mb:3}}>

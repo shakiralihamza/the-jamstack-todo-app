@@ -10,97 +10,88 @@ import IconButton from "@mui/material/IconButton";
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import EditIcon from '@mui/icons-material/Edit';
 import {Checkbox, CircularProgress} from "@mui/material";
-import {useState} from "react";
-// import {MyContext} from "../context/MyContext";
+import {useContext, useEffect, useState} from "react";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-/*
+import {gql, useMutation, useQuery} from "@apollo/client";
+import MyContext from "../context/MyContext";
+import {Todo} from "../interfaces";
 
-const deleteTodo = (todoId) => {
-    return fetch('/.netlify/functions/delete', {
-        body: JSON.stringify({id: todoId}),
-        method: 'POST',
-    }).then(response => {
-        return response.json()
-    })
-}
-const updateTodo = (updatedTodo) => {
-    return fetch('/.netlify/functions/update', {
-        body: JSON.stringify(updatedTodo),
-        method: 'POST',
-    }).then(response => {
-        return response.json()
-    })
-}
-*/
+const READ_TODOS = gql`
+    query {
+        todos {
+            id
+            title
+            author
+            completed
+        }
+    }
+`;
+
+const DELETE_TODO = gql`
+    mutation deleteTodo($deleteTodoId: ID!) {
+        deleteTodo(id: $deleteTodoId) {
+            id
+        }
+    }
+`;
+const DONE_TODO = gql`
+    mutation doneTodo($doneTodoId: ID!, $completed: Boolean!) {
+        doneTodo(id: $doneTodoId, completed: $completed) {
+            id
+        }
+    }
+`;
 
 export default function BasicTable() {
-    // const {todos, setTodos, setIsEditDialogOpen, setTodoToEdit} = useContext(MyContext);
-    const [isLoading, setIsLoading] = useState(false);
+    const {todos, setTodos, setIsEditDialogOpen, setTodoToEdit} = useContext(MyContext);
+    const [isLoading, setIsLoading] = useState(true);
     const [isDeleting, setIsDeleting] = useState(false);
     const [isCompleting, setIsCompleting] = useState(false);
     const [deletingId, setDeletingId] = useState('');
     const [completingId, setCompletingId] = useState('');
-const todos: any = []
-/*
+
+    const {data} = useQuery(READ_TODOS);
+    const [deleteTodo] = useMutation(DELETE_TODO)
+    const [doneTodo] = useMutation(DONE_TODO)
     useEffect(() => {
-        fetch('/.netlify/functions/read-all')
-            .then(response => {
-                return response.json()
-            })
-            .then(data => {
-                const todos = data.map(todo => ({...todo.data, id: todo.ref['@ref'].id}))
-                // alert(JSON.stringify(todos))
-                setIsLoading(false)
-                setTodos(todos)
-            }).catch(error => {
-            console.log('error: ' + error)
-        })
+        if (data) {
+            setIsLoading(false)
+            setTodos(data.todos)
+        }
+    }, [data])
 
-    }, [setTodos])
-*/
-
-    const handleDelete = (id: any) => {
-       /* setIsDeleting(true);
+    const handleDelete = (id: string) => {
+        setIsDeleting(true);
         setDeletingId(id)
-        deleteTodo(id)
-            .then((response) => {
-                console.log('Delete API response', response)
-                // set app state
+        deleteTodo({variables: {deleteTodoId: id}})
+            .then(() => {
                 setIsDeleting(false);
                 setDeletingId('');
                 setTodos(todos.filter(todo => todo.id !== id))
             })
-            .catch((error) => {
-                console.log('API error', error)
-            })*/
     }
-    const handleDone = (todo: any) => {
-       /* setIsCompleting(true);
+    const handleDone = (todo: Todo) => {
+        setIsCompleting(true);
         setCompletingId(todo.id)
         const updatedTodo = {
             ...todo,
             completed: !todo.completed
         }
-        updateTodo(updatedTodo)
-            .then((response) => {
-                console.log('Update API response', response)
-                // set app state
+        doneTodo({variables: {doneTodoId: todo.id, completed: !todo.completed}})
+            .then(() => {
                 setIsCompleting(false);
                 setCompletingId('');
-                //update todo in state
-                const newTodos = todos.map(todo => todo.id === response.data.id ? response.data : todo)
-                setTodos(newTodos)
+                setTodos(todos.map(t => t.id === todo.id ? updatedTodo : t))
             })
-            .catch((error) => {
-                console.log('API error', error)
-            })*/
+            .catch(err => {
+                console.log('GQL Delete error: ', err)
+            })
     }
 
-    const handleEdit =(todo: any)=>{
-       /* setTodoToEdit(todo);
-        setIsEditDialogOpen(true);*/
-
+    const handleEdit = (todo: Todo) => {
+        setTodoToEdit(todo);
+        setIsEditDialogOpen(true);
     }
     if (isLoading) {
         return <>
@@ -121,7 +112,7 @@ const todos: any = []
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {todos.map((todo: any) => {
+                    {todos.map((todo: Todo) => {
                         return (
                             <TableRow
                                 key={todo.id}
@@ -134,7 +125,7 @@ const todos: any = []
                                 <TableCell padding="checkbox">
                                     {
                                         isCompleting && todo.id === completingId
-                                            ? <CircularProgress color={'primary'} size={18} sx={{ml:1.5}}/>
+                                            ? <CircularProgress color={'primary'} size={18} sx={{ml: 1.5}}/>
                                             :
                                             <Checkbox
                                                 onClick={() => handleDone(todo)}
@@ -144,7 +135,7 @@ const todos: any = []
                                     }
                                 </TableCell>
                                 <TableCell>
-                                    {todo.item}
+                                    {todo.title}
                                 </TableCell>
                                 <TableCell align="left">{todo.author}</TableCell>
                                 <TableCell align="right">
