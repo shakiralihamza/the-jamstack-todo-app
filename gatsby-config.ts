@@ -15,7 +15,7 @@ const config: GatsbyConfig = {
         {
             resolve: 'gatsby-plugin-apollo',
             options: {
-                uri: '.netlify/functions/fauna-graphql'
+                uri: 'https://project-12c-thejamstacktodoapp.netlify.app/.netlify/functions/fauna-graphql'
             }
         }
     ],
