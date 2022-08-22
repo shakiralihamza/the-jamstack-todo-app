@@ -13,6 +13,9 @@ type defaultProps = {
 
     isDialogOpen: boolean;
     setIsDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+
+    user: any;
+    setUser: React.Dispatch<React.SetStateAction<any>>;
 }
 
 // @ts-ignore
@@ -23,6 +26,7 @@ const defaultState: defaultProps = {
 const MyContext = React.createContext(defaultState)
 
 const ContextProvider = ({children}: { children: React.ReactNode }) => {
+    const [user, setUser] = React.useState<Todo[]>(defaultState.todos)
     const [todos, setTodos] = React.useState<Todo[]>([])
     const [isEditDialogOpen, setIsEditDialogOpen] = React.useState<boolean>(false)
     const [isDialogOpen, setIsDialogOpen] = React.useState<boolean>(false)
@@ -43,7 +47,10 @@ const ContextProvider = ({children}: { children: React.ReactNode }) => {
         setTodoToEdit,
 
         isDialogOpen,
-        setIsDialogOpen
+        setIsDialogOpen,
+
+        user,
+        setUser
     }
 
     return (
