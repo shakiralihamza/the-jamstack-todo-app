@@ -12,12 +12,7 @@ const config: GatsbyConfig = {
         'gatsby-plugin-top-layout',
         'gatsby-plugin-mui-emotion',
         'gatsby-plugin-react-helmet',
-        {
-            resolve: 'gatsby-plugin-apollo',
-            options: {
-                uri: 'https://project-12c-thejamstacktodoapp.netlify.app/.netlify/functions/fauna-graphql'
-            }
-        }
+        'gatsby-plugin-apollo',
     ],
 }
 

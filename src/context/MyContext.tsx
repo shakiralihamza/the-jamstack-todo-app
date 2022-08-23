@@ -26,7 +26,7 @@ const defaultState: defaultProps = {
 const MyContext = React.createContext(defaultState)
 
 const ContextProvider = ({children}: { children: React.ReactNode }) => {
-    const [user, setUser] = React.useState<Todo[]>(defaultState.todos)
+    const [user, setUser] = React.useState<any>('')
     const [todos, setTodos] = React.useState<Todo[]>([])
     const [isEditDialogOpen, setIsEditDialogOpen] = React.useState<boolean>(false)
     const [isDialogOpen, setIsDialogOpen] = React.useState<boolean>(false)
@@ -34,8 +34,10 @@ const ContextProvider = ({children}: { children: React.ReactNode }) => {
         id: '',
         title: '',
         author: '',
-        completed: false
+        completed: false,
+        createdAt: ''
     })
+
     const contextValues = {
         todos,
         setTodos,

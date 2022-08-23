@@ -1,14 +1,15 @@
 import React from "react"
-import { Router } from "@reach/router"
+import {Router} from "@reach/router"
 import Layout from "../components/layout";
 import TodoApp from "../components/TodoApp";
+import PrivateRoute from "../components/PrivateRoute"
+import Default from "../components/Default"
 
 const App = () => {
-    // @ts-ignore
     return (
         <Layout>
             <Router basepath="/app">
-                <TodoApp path="/" />
+                <PrivateRoute path="/" component={TodoApp} default={Default}/>
             </Router>
         </Layout>
     )
