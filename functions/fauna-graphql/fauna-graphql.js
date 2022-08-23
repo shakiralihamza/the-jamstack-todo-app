@@ -12,6 +12,7 @@ const getHandler = (event, context) => {
             author: String!
             completed: Boolean!
             authorId: String!
+            createdAt: String!
         }
         type Query {
             todos: [Todo!]
@@ -26,24 +27,24 @@ const getHandler = (event, context) => {
 
     const resolvers = {
         Query: {
-            todos: async (parents, args, {user}) => {
-                if (!user) {
+            todos: async (parents, args, {authorId}) => {
+                if (!authorId) {
                     return [];
                 } else {
-                    const response = await client.query(q.Paginate(q.Match(q.Index('todosByAuthor'), user)))
-
-                    return response.data.map(([ref, title, author, completed]) => ({
+                    const response = await client.query(q.Paginate(q.Match(q.Index('todosByAuthor'), authorId)))
+                    return response.data.map(([ref, ts, title, author, completed]) => ({
                         id: ref.id,
+                        createdAt: ts,
                         title,
                         author,
-                        completed
+                        completed,
                     }))
                 }
             }
         },
         Mutation: {
-            createTodo: async (_, {title, author}, {user}) => {
-                if (!user) {
+            createTodo: async (_, {title, author}, {authorId}) => {
+                if (!authorId) {
                     throw new Error('Not authenticated')
                 }
                 const response = await client.query(q.Create(q.Collection('todos'), {
@@ -51,11 +52,12 @@ const getHandler = (event, context) => {
                         title,
                         author,
                         completed: false,
-                        authorId: user
+                        authorId,
                     }
                 }))
                 return {
                     id: response.ref.id,
+                    createdAt: response.ts,
                     ...response.data
                 }
 
@@ -64,6 +66,7 @@ const getHandler = (event, context) => {
                 const response = await client.query(q.Update(q.Ref(q.Collection('todos'), id), {data: {completed}}))
                 return {
                     id: response.ref.id,
+                    createdAt: response.ts,
                     ...response.data,
                 }
             },
@@ -78,6 +81,7 @@ const getHandler = (event, context) => {
                 const response = await client.query(q.Update(q.Ref(q.Collection('todos'), id), {data: {title}}))
                 return {
                     id: response.ref.id,
+                    createdAt: response.ts,
                     ...response.data
                 }
             }
@@ -88,7 +92,7 @@ const getHandler = (event, context) => {
         resolvers,
         context: ({context}) => {
             if (context.clientContext.user) {
-                return {user: context.clientContext.user.sub};
+                return {authorId: context.clientContext.user.sub};
             } else {
                 return {};
             }

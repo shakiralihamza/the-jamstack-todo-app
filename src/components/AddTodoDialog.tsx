@@ -16,25 +16,24 @@ const CREATE_TODO = gql`
             title
             author
             completed
+            createdAt
         }
     }
 `;
 
 export default function AddTodoDialog() {
     const [title, setTitle] = React.useState('');
-    const [author, setAuthor] = React.useState('');
-    const {todos, setTodos, isDialogOpen, setIsDialogOpen} = useContext(MyContext);
+    const {todos, setTodos, isDialogOpen, setIsDialogOpen, user} = useContext(MyContext);
 
     const [createTodo] = useMutation(CREATE_TODO);
     const [isLoading, setIsLoading] = React.useState(false);
     const handleSubmit = () => {
         setIsLoading(true);
 
-        createTodo({variables: {title, author}})
+        createTodo({variables: {title, author: user.user_metadata.full_name}})
             .then((response) => {
                 setTodos([...todos, response.data.createTodo]);
                 setTitle('')
-                setAuthor('')
                 setIsLoading(false)
                 handleClose()
             })
@@ -91,13 +90,6 @@ export default function AddTodoDialog() {
                                 label="Todo Item"
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
-                            />
-                            <TextField
-                                disabled={isLoading}
-                                variant={"outlined"}
-                                label="Author"
-                                value={author}
-                                onChange={(e) => setAuthor(e.target.value)}
                             />
                         </Stack>
 

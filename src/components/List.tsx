@@ -16,6 +16,7 @@ import Box from "@mui/material/Box";
 import {gql, useMutation, useQuery} from "@apollo/client";
 import MyContext from "../context/MyContext";
 import {Todo} from "../interfaces";
+import {formatRelative} from 'date-fns'
 
 const READ_TODOS = gql`
     query {
@@ -24,6 +25,7 @@ const READ_TODOS = gql`
             title
             author
             completed
+            createdAt
         }
     }
 `;
@@ -89,6 +91,24 @@ export default function BasicTable() {
             })
     }
 
+    const getFormattedDate = (date: string) => {
+        const theDate = new Date(Number(date) / 1000);
+
+        /*const theDate = new Date(Number(date) / 1000);
+        const postFix = (
+            theDate.getDate() === 1 || theDate.getDate() === 21 || theDate.getDate() === 31 ? <sub>'st'</sub>
+                : theDate.getDate() === 2 || theDate.getDate() === 22 ? <sub>'nd'</sub>
+                    : theDate.getDate() === 3 || theDate.getDate() === 23 ? <sub>'rd'</sub>
+                        : <sub>'th'</sub>
+        );
+        const day = theDate.getDate();
+        const month = theDate.toLocaleString('default', {month: 'short'});
+        const year = theDate.getFullYear();
+        console.log('postfix: ', postFix.)
+        return `${day}${postFix} ${month}, ${year}`;*/
+        // @ts-ignore
+        return formatRelative(theDate, new Date(), {weekStartsOn: 1})
+    }
     const handleEdit = (todo: Todo) => {
         setTodoToEdit(todo);
         setIsEditDialogOpen(true);
@@ -108,6 +128,7 @@ export default function BasicTable() {
                         <TableCell></TableCell>
                         <TableCell>Item</TableCell>
                         <TableCell align="left">Author</TableCell>
+                        <TableCell align="left">Date</TableCell>
                         <TableCell align="right"/>
                     </TableRow>
                 </TableHead>
@@ -138,6 +159,7 @@ export default function BasicTable() {
                                     {todo.title}
                                 </TableCell>
                                 <TableCell align="left">{todo.author}</TableCell>
+                                <TableCell align="left">{getFormattedDate(todo.createdAt)}</TableCell>
                                 <TableCell align="right">
                                     <IconButton
                                         disableRipple

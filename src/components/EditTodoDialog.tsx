@@ -12,9 +12,10 @@ import {Todo} from "../interfaces";
 
 
 const UPDATE_TODO = gql`
-    mutation UpdateTodo($updateTodoId: ID!, $title: String!, $author: String!) {
-        updateTodo(id: $updateTodoId, title: $title, author: $author) {
+    mutation UpdateTodo($updateTodoId: ID!, $title: String!) {
+        updateTodo(id: $updateTodoId, title: $title) {
             id
+            createdAt
         }
     }
 `;
@@ -24,35 +25,37 @@ export default function EditTodoDialog() {
 
     const [updateTodo] = useMutation(UPDATE_TODO);
     const [title, setTitle] = React.useState<string>('');
-    const [author, setAuthor] = React.useState<string>('');
     const [isLoading, setIsLoading] = React.useState(false);
     useEffect(() => {
         setTitle(todoToEdit.title);
-        setAuthor(todoToEdit.author);
+        console.log('useeffect: ', todos);
     }, [isEditDialogOpen]);
 
     const handleSubmit = () => {
         setIsLoading(true);
         const updatedTodo = {
             ...todoToEdit,
-            title,
-            author
+            title
         }
         console.log(todoToEdit);
-        updateTodo({variables: {updateTodoId: todoToEdit.id, title, author}})
-            .then(() => {
+        updateTodo({variables: {updateTodoId: todoToEdit.id, title}})
+            .then((response) => {
+                setIsLoading(false)
+                handleClose()
+                setTitle('')
+                console.log('current state Before, ', todos)
                 const newTodos: Todo[] = todos.map(todo => {
-                    if (todo.id === updatedTodo.id) {
-                        return updatedTodo;
+                    if (todo.id === todoToEdit.id) {
+                        return {...updatedTodo, createdAt: response.data.updateTodo.createdAt}
                     }
                     return todo;
                 })
-                setTodos(newTodos)
 
-                setTitle('')
-                setAuthor('')
-                setIsLoading(false)
-                handleClose()
+                console.log(' Update, ', newTodos)
+
+                setTodos(newTodos)
+                console.log('current state After, ', todos)
+
             }).catch((err) => console.log('error: ', err))
     }
     const handleClose = () => {
@@ -102,13 +105,6 @@ export default function EditTodoDialog() {
                                 variant={"outlined"}
                                 label="Todo Item"
                                 onChange={(e) => setTitle(e.target.value)}
-                            />
-                            <TextField
-                                disabled={isLoading}
-                                value={author}
-                                variant={"outlined"}
-                                label="Author"
-                                onChange={(e) => setAuthor(e.target.value)}
                             />
                         </Stack>
 
