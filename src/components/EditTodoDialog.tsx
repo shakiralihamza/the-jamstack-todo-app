@@ -28,7 +28,6 @@ export default function EditTodoDialog() {
     const [isLoading, setIsLoading] = React.useState(false);
     useEffect(() => {
         setTitle(todoToEdit.title);
-        console.log('useeffect: ', todos);
     }, [isEditDialogOpen]);
 
     const handleSubmit = () => {
@@ -43,18 +42,13 @@ export default function EditTodoDialog() {
                 setIsLoading(false)
                 handleClose()
                 setTitle('')
-                console.log('current state Before, ', todos)
                 const newTodos: Todo[] = todos.map(todo => {
                     if (todo.id === todoToEdit.id) {
                         return {...updatedTodo, createdAt: response.data.updateTodo.createdAt}
                     }
                     return todo;
                 })
-
-                console.log(' Update, ', newTodos)
-
                 setTodos(newTodos)
-                console.log('current state After, ', todos)
 
             }).catch((err) => console.log('error: ', err))
     }
