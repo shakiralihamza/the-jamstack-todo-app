@@ -4,6 +4,7 @@ import Layout from "../components/layout";
 import TodoApp from "../components/TodoApp";
 import PrivateRoute from "../components/PrivateRoute"
 import Default from "../components/Default"
+import {HeadFC} from "gatsby";
 
 const App = () => {
     return (
@@ -16,3 +17,5 @@ const App = () => {
 }
 
 export default App
+
+export const Head: HeadFC = () => <title>Dashboard</title>
