@@ -17,10 +17,10 @@ const getHandler = (event, context) => {
             todos: [Todo!]
         }
         type Mutation {
-            createTodo(title: String!, author: String!, authorId: String!): Todo
+            createTodo(title: String!, author: String!): Todo
             doneTodo(id: ID!, completed: Boolean!): Todo
             deleteTodo(id: ID!): Todo
-            updateTodo(id: ID!, title: String!, author: String!): Todo
+            updateTodo(id: ID!, title: String!): Todo
         }
     `;
 
@@ -42,14 +42,16 @@ const getHandler = (event, context) => {
             }
         },
         Mutation: {
-            createTodo: async (_, {title, author, authorId}) => {
-                const completed = false;
+            createTodo: async (_, {title, author}, {user}) => {
+                if (!user) {
+                    throw new Error('Not authenticated')
+                }
                 const response = await client.query(q.Create(q.Collection('todos'), {
                     data: {
                         title,
                         author,
-                        completed,
-                        authorId
+                        completed: false,
+                        authorId: user
                     }
                 }))
                 return {
@@ -72,8 +74,8 @@ const getHandler = (event, context) => {
                     ...response.data
                 }
             },
-            updateTodo: async (_, {id, title, author}) => {
-                const response = await client.query(q.Update(q.Ref(q.Collection('todos'), id), {data: {title, author}}))
+            updateTodo: async (_, {id, title}) => {
+                const response = await client.query(q.Update(q.Ref(q.Collection('todos'), id), {data: {title}}))
                 return {
                     id: response.ref.id,
                     ...response.data
