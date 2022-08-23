@@ -11,12 +11,13 @@ const getHandler = (event, context) => {
             title: String!
             author: String!
             completed: Boolean!
+            authorId: String!
         }
         type Query {
             todos: [Todo!]
         }
         type Mutation {
-            createTodo(title: String!, author: String!): Todo
+            createTodo(title: String!, author: String!, authorId: String!): Todo
             doneTodo(id: ID!, completed: Boolean!): Todo
             deleteTodo(id: ID!): Todo
             updateTodo(id: ID!, title: String!, author: String!): Todo
@@ -25,21 +26,32 @@ const getHandler = (event, context) => {
 
     const resolvers = {
         Query: {
-            todos: async () => {
-                const response = await client.query(q.Paginate(q.Match(q.Index('todos'))))
+            todos: async (parents, args, {user}) => {
+                if (!user) {
+                    return [];
+                } else {
+                    const response = await client.query(q.Paginate(q.Match(q.Index('todosByAuthor'), user)))
 
-                return response.data.map(([ref, title, author, completed]) => ({
-                    id: ref.id,
-                    title,
-                    author,
-                    completed
-                }))
+                    return response.data.map(([ref, title, author, completed]) => ({
+                        id: ref.id,
+                        title,
+                        author,
+                        completed
+                    }))
+                }
             }
         },
         Mutation: {
-            createTodo: async (_, {title, author}) => {
+            createTodo: async (_, {title, author, authorId}) => {
                 const completed = false;
-                const response = await client.query(q.Create(q.Collection('todos'), {data: {title, author, completed}}))
+                const response = await client.query(q.Create(q.Collection('todos'), {
+                    data: {
+                        title,
+                        author,
+                        completed,
+                        authorId
+                    }
+                }))
                 return {
                     id: response.ref.id,
                     ...response.data
@@ -72,6 +84,13 @@ const getHandler = (event, context) => {
     const server = new ApolloServer({
         typeDefs,
         resolvers,
+        context: ({context}) => {
+            if (context.clientContext.user) {
+                return {user: context.clientContext.user.sub};
+            } else {
+                return {};
+            }
+        }
     });
     const graphqlHandler = server.createHandler();
     if (!event.requestContext) {
