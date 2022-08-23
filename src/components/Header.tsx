@@ -50,7 +50,7 @@ export default function Header() {
                         <AppsIcon fontSize={'large'}/>
                     </IconButton>
                     <Typography variant="h5" fontWeight={100} sx={{flexGrow: 1}}>
-                        Jamstack ToDo App
+                        JAMStack ToDo App
                     </Typography>
 
                     <Grid
