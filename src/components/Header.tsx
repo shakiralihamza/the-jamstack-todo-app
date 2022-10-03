@@ -49,10 +49,12 @@ export default function Header() {
                     >
                         <AppsIcon fontSize={'large'}/>
                     </IconButton>
-                    <Typography variant="h5" fontWeight={100} sx={{flexGrow: 1}}>
-                        JAMStack Todo App
-                    </Typography>
-
+                    <Box sx={{flexGrow: 1}}>
+                        <Typography variant="h5" fontWeight={100}
+                                    sx={{display: {xs: 'none', sm: 'initial'}}}>
+                            {"JAMStack Todo App"}
+                        </Typography>
+                    </Box>
                     <Grid
                         container
                         sx={{width: '180px', height: '100%'}}
